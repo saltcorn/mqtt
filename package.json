@@ -1,0 +1,17 @@
+{
+  "name": "@saltcorn/mqtt",
+  "version": "0.1.0",
+  "description": "MQTT events",
+  "main": "index.js",
+  "dependencies": {
+    "@saltcorn/markup": "^0.5.1",
+    "@saltcorn/data": "^0.5.1",
+    "async-mqtt": "^2.6.1"
+  },
+  "author": "Tom Nielsen",
+  "license": "MIT",
+  "repository": "github:saltcorn/mqtt",
+  "publishConfig": {
+    "access": "public"
+  }
+}
