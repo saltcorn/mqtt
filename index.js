@@ -8,11 +8,11 @@ let client;
 
 const configuration_workflow = () =>
   new Workflow({
-    onDone: async (cfg) => {
+    /* onDone: async (cfg) => {
       await onLoad(cfg);
       return cfg;
     },
-    steps: [
+*/ steps: [
       {
         name: "MQTT configuration",
         form: () =>
@@ -44,7 +44,7 @@ const configuration_workflow = () =>
 
 const onLoad = async ({ broker_url, subscribe_channels, is_json }) => {
   if (client) await client.end();
-  client = mqtt.connect(broker_url);
+  client = mqtt.connect(broker_url, { reconnectPeriod: 1000 });
   client.on("connect", function () {
     for (channel of subscribe_channels.split(","))
       client.subscribe(channel.trim());
@@ -53,7 +53,7 @@ const onLoad = async ({ broker_url, subscribe_channels, is_json }) => {
     const payload = is_json
       ? JSON.parse(message.toString())
       : message.toString();
-    Trigger.emitEvent("MqttReceive", topic, payload);
+    Trigger.emitEvent("MqttReceive", topic, null, payload);
   });
 };
 
@@ -65,7 +65,7 @@ module.exports = {
     mqtt_publish: {
       configFields: [{ name: "channel", label: "Channel", type: "String" }],
       run: async ({ row, configuration: { channel } }) => {
-        await client.publish(channel, JSON.stringify(row));
+        client.publish(channel, JSON.stringify(row));
       },
     },
   }),
