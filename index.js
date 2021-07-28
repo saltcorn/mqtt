@@ -1,6 +1,6 @@
 const Workflow = require("@saltcorn/data/models/workflow");
-const Form = require("@altcorn/data/models/form");
-const Trigger = require("@altcorn/data/models/trigger");
+const Form = require("@saltcorn/data/models/form");
+const Trigger = require("@saltcorn/data/models/trigger");
 
 const mqtt = require("async-mqtt");
 
@@ -45,11 +45,15 @@ const configuration_workflow = () =>
 const onLoad = async ({ broker_url, subscribe_channels, is_json }) => {
   if (client) await client.end();
   client = mqtt.connect(broker_url);
-  for (channel of subscribe_channels.split(","))
-    await client.subscribe(channel.trim());
+  client.on("connect", function () {
+    for (channel of subscribe_channels.split(","))
+      client.subscribe(channel.trim());
+  });
   client.on("message", function (topic, message) {
-    const payload = is_json ? JSON.parse(message.toString()) : message.toString()
-    await Trigger.emitEvent("MqttReceive", topic, payload)
+    const payload = is_json
+      ? JSON.parse(message.toString())
+      : message.toString();
+    Trigger.emitEvent("MqttReceive", topic, payload);
   });
 };
 
