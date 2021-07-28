@@ -71,8 +71,7 @@ module.exports = {
   }),
   eventTypes: () => ({
     MqttReceive: {
-      hasChannelName: true,
-      channelNameIsTable: false,
+      hasChannel: true,
     },
   }),
 };
