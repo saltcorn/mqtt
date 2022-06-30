@@ -42,7 +42,9 @@ const configuration_workflow = () =>
     ],
   });
 
-const onLoad = async ({ broker_url, subscribe_channels, is_json }) => {
+const onLoad = async (cfg) => {
+  if (!cfg) return;
+  const { broker_url, subscribe_channels, is_json } = cfg;
   if (client) await client.end();
   client = mqtt.connect(broker_url, { reconnectPeriod: 1000 });
   client.on("connect", function () {
