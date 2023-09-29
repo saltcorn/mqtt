@@ -27,7 +27,7 @@ const configuration_workflow = () =>
               {
                 name: "subscribe_channels",
                 label: "Subscribe to channels",
-                sublabels: "Separate by comma",
+                sublabel: "Separate by commas if more than one",
                 type: "String",
                 required: true,
               },
@@ -46,12 +46,16 @@ const onLoad = async (cfg) => {
   if (!cfg) return;
   const { broker_url, subscribe_channels, is_json } = cfg;
   if (client) await client.end();
-  client = mqtt.connect(broker_url, { reconnectPeriod: 1000 });
+  const broker_url1 = broker_url.includes("://")
+    ? broker_url
+    : `mqtt://${broker_url}`;
+  client = mqtt.connect(broker_url1, { reconnectPeriod: 1000 });
   client.on("connect", function () {
     for (channel of subscribe_channels.split(","))
       client.subscribe(channel.trim());
   });
   client.on("message", function (topic, message) {
+    //console.log("MQTT", topic, message);
     const payload = is_json
       ? JSON.parse(message.toString())
       : message.toString();
