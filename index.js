@@ -1,6 +1,7 @@
 const Workflow = require("@saltcorn/data/models/workflow");
 const Form = require("@saltcorn/data/models/form");
 const Trigger = require("@saltcorn/data/models/trigger");
+const cluster = require("cluster");
 
 const mqtt = require("async-mqtt");
 
@@ -44,6 +45,8 @@ const configuration_workflow = () =>
 
 const onLoad = async (cfg) => {
   if (!cfg) return;
+  if (!cluster.isMaster) return;
+
   const { broker_url, subscribe_channels, is_json } = cfg;
   if (client) await client.end();
   const broker_url1 = broker_url.includes("://")
