@@ -54,7 +54,7 @@ const onLoad = async (cfg) => {
     : `mqtt://${broker_url}`;
   client = mqtt.connect(broker_url1, { reconnectPeriod: 1000 });
   client.on("connect", function () {
-    for (channel of subscribe_channels.split(","))
+    for (const channel of subscribe_channels.split(","))
       client.subscribe(channel.trim());
   });
   client.on("message", function (topic, message) {
