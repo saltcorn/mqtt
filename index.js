@@ -45,7 +45,6 @@ const configuration_workflow = () =>
 
 const onLoad = async (cfg) => {
   if (!cfg) return;
-  if (!cluster.isMaster) return;
 
   const { broker_url, subscribe_channels, is_json } = cfg;
   if (client) await client.end();
@@ -53,6 +52,9 @@ const onLoad = async (cfg) => {
     ? broker_url
     : `mqtt://${broker_url}`;
   client = mqtt.connect(broker_url1, { reconnectPeriod: 1000 });
+
+  if (!cluster.isMaster) return;
+
   client.on("connect", function () {
     for (const channel of subscribe_channels.split(","))
       client.subscribe(channel.trim());
