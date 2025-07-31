@@ -61,10 +61,14 @@ const onLoad = async (cfg) => {
   });
   client.on("message", function (topic, message) {
     //console.log("MQTT", topic, message);
-    const payload = is_json
-      ? JSON.parse(message.toString())
-      : message.toString();
-    Trigger.emitEvent("MqttReceive", topic, null, payload);
+    try {
+      const payload = is_json
+        ? JSON.parse(message.toString())
+        : message.toString();
+      Trigger.emitEvent("MqttReceive", topic, null, payload);
+    } catch (e) {
+      console.error("mqtt message parsing error: ", e);
+    }
   });
 };
 
