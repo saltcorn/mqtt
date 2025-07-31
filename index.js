@@ -37,6 +37,64 @@ const configuration_workflow = () =>
                 label: "Messages are JSON",
                 type: "Bool",
               },
+              {
+                name: "username",
+                label: "Username",
+                type: "String",
+              },
+              {
+                name: "port",
+                label: "Port",
+                type: "Integer",
+                default: 1883,
+              },
+              {
+                name: "protocol",
+                label: "Protocol",
+                type: "String",
+                required: true,
+                attributes: {
+                  options: [
+                    "mqtt",
+                    "mqtts",
+                    "tcp",
+                    "tls",
+                    "ws",
+                    "wss",
+                    "wxs",
+                    "alis",
+                  ],
+                },
+              },
+              {
+                name: "password",
+                label: "Password",
+                type: "String",
+                fieldview: "password",
+              },
+              {
+                name: "allow_self_signed",
+                label: "Allow self signed",
+                type: "Bool",
+              },
+              {
+                name: "CA",
+                label: "Certificate authority",
+                type: "String",
+                fieldview: "textarea",
+              },
+              {
+                name: "cert",
+                label: "Certificate",
+                type: "String",
+                fieldview: "textarea",
+              },
+              {
+                name: "key",
+                label: "Certificate key",
+                type: "String",
+                fieldview: "textarea",
+              },
             ],
           }),
       },
@@ -50,8 +108,13 @@ const onLoad = async (cfg) => {
   if (client) await client.end();
   const broker_url1 = broker_url.includes("://")
     ? broker_url
-    : `mqtt://${broker_url}`;
-  client = mqtt.connect(broker_url1, { reconnectPeriod: 1000 });
+    : `${cfg.protocol || "mqtt"}://${broker_url}`;
+  const opts = { reconnectPeriod: 1000 };
+  for (const k of "username password port protocol cert key".split(" "))
+    if (cfg[k]) opts[k] = cfg[k];
+  if (cfg.allow_self_signed) opts.rejectUnauthorized = false;
+  if (cfg.ca) opts.ca = [cfg.ca];
+  client = mqtt.connect(broker_url1, opts);
 
   if (!cluster.isMaster) return;
 
